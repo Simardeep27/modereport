@@ -45,9 +45,7 @@ class ChestXrayDataSet(Dataset):
 
     def __getitem__(self, index):
         image_name = self.file_names[index]
-        print(image_name)
         image_name=image_name[3:]
-        print(image_name)
 
         image = Image.open(self.image_dir+'/'+image_name).convert('RGB')
 
