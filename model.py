@@ -59,23 +59,25 @@ class MLC(nn.Module):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     import warnings
     warnings.filterwarnings("ignore")
 #
     extractor = CustomVisual(model_name='densenet201',pretrained=True)
-    tags=MLC(fc_in_features=extractor.out_features)
+    mlc = MLC(fc_in_features=extractor.out_features)
+    images = torch.randn((4, 3, 224, 224))
+    hidden_state = torch.randn((4, 1, 512))
+
+    print("images:{}".format(images.shape))
+    print("hidden_states:{}".format(hidden_state.shape))
+
+    visual_features, avg_features = extractor.forward(images)
+
+    print("visual_features:{}".format(visual_features.shape))
+    print("avg features:{}".format(avg_features.shape))
+
+    tags, semantic_features = mlc.forward(avg_features)
     print(tags)
+    print("semantic_features shape: ",semantic_features.shape)
 
 
