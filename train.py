@@ -57,8 +57,8 @@ class DebuggerBase:
 
     def train(self):
         for epoch_id in range(self.start_epoch, self.args.epochs):
-            train_tag_loss, train_stop_loss, train_word_loss, train_loss = self._epoch_train()
-            val_tag_loss, val_stop_loss, val_word_loss, val_loss = self._epoch_val()
+            train_tag_loss, train_loss = self._epoch_train()
+            val_tag_loss, val_loss = self._epoch_val()
 
             if self.args.mode == 'train':
                 self.scheduler.step(train_loss)
@@ -78,16 +78,10 @@ class DebuggerBase:
             self._save_model(epoch_id,
                              val_loss,
                              val_tag_loss,
-                             val_stop_loss,
-                             val_word_loss,
                              train_loss)
             self._log(train_tags_loss=train_tag_loss,
-                      train_stop_loss=train_stop_loss,
-                      train_word_loss=train_word_loss,
                       train_loss=train_loss,
                       val_tags_loss=val_tag_loss,
-                      val_stop_loss=val_stop_loss,
-                      val_word_loss=val_word_loss,
                       val_loss=val_loss,
                       lr=self.optimizer.param_groups[0]['lr'],
                       epoch=epoch_id)
