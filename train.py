@@ -1,6 +1,7 @@
 import time
 import pickle
 import argparse
+import os
 
 import torch
 import torch.optim as optim
@@ -8,10 +9,9 @@ import torchvision.transforms as transforms
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
+from dataset import *
+from model import *
 
-from utils.models import *
-from utils.dataset import *
-from utils.loss import *
 from utils.logger import Logger
 
 
@@ -122,7 +122,7 @@ class DebuggerBase:
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
 
-        model_dir = os.path.join(model_dir, self._get_now())
+        model_dir = os.path.join(model_dir)
 
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -207,14 +207,12 @@ class DebuggerBase:
                             visual_size=self.extractor.out_features,
                             k=self.args.k,
                             momentum=self.args.momentum)
-
         try:
             model_state = torch.load(self.args.load_co_model_path)
             model.load_state_dict(model_state['model'])
             self.writer.write("[Load Co-attention Succeed!]\n")
         except Exception as err:
             self.writer.write("[Load Co-attention Failed {}!]\n".format(err))
-
         if not self.args.co_trained:
             for i, param in enumerate(model.parameters()):
                 param.requires_grad = False
@@ -223,14 +221,11 @@ class DebuggerBase:
                 self.params += list(model.parameters())
             else:
                 self.params = list(model.parameters())
-
         if self.args.cuda:
             model = model.cuda()
         return model
-
     def _init_sentence_model(self):
         raise NotImplementedError
-
     def _init_word_model(self):
         raise NotImplementedError'''
 
@@ -385,9 +380,9 @@ class LSTMDebugger(DebuggerBase):
 
             self.optimizer.zero_grad()
             batch_loss.backward()
-            if self.args.clip > 0:
-                torch.nn.utils.clip_grad_norm(self.sentence_model.parameters(), self.args.clip)
-                torch.nn.utils.clip_grad_norm(self.word_model.parameters(), self.args.clip)
+            # if self.args.clip > 0:
+            #     torch.nn.utils.clip_grad_norm(self.sentence_model.parameters(), self.args.clip)
+            #     torch.nn.utils.clip_grad_norm(self.word_model.parameters(), self.args.clip)
             self.optimizer.step()
 
             tag_loss += self.args.lambda_tag * batch_tag_loss.data
@@ -457,14 +452,12 @@ class LSTMDebugger(DebuggerBase):
                              num_layers=self.args.sentence_num_layers,
                              dropout=self.args.dropout,
                              momentum=self.args.momentum)
-
         try:
             model_state = torch.load(self.args.load_sentence_model_path)
             model.load_state_dict(model_state['model'])
             self.writer.write("[Load Sentence Model Succeed!\n")
         except Exception as err:
             self.writer.write("[Load Sentence model Failed {}!]\n".format(err))
-
         if not self.args.sentence_trained:
             for i, param in enumerate(model.parameters()):
                 param.requires_grad = False
@@ -473,25 +466,21 @@ class LSTMDebugger(DebuggerBase):
                 self.params += list(model.parameters())
             else:
                 self.params = list(model.parameters())
-
         if self.args.cuda:
             model = model.cuda()
         return model
-
     def _init_word_model(self):
         model = WordLSTM(vocab_size=len(self.vocab),
                          embed_size=self.args.embed_size,
                          hidden_size=self.args.hidden_size,
                          num_layers=self.args.word_num_layers,
                          n_max=self.args.n_max)
-
         try:
             model_state = torch.load(self.args.load_word_model_path)
             model.load_state_dict(model_state['model'])
             self.writer.write("[Load Word Model Succeed!\n")
         except Exception as err:
             self.writer.write("[Load Word model Failed {}!]\n".format(err))
-
         if not self.args.word_trained:
             for i, param in enumerate(model.parameters()):
                 param.requires_grad = False
@@ -500,7 +489,6 @@ class LSTMDebugger(DebuggerBase):
                 self.params += list(model.parameters())
             else:
                 self.params = list(model.parameters())
-
         if self.args.cuda:
             model = model.cuda()
         return model
@@ -521,7 +509,7 @@ if __name__ == '__main__':
     # Path Argument
     parser.add_argument('--vocab_path', type=str, default='./data/new_data/vocab.pkl',
                         help='the path for vocabulary object')
-    parser.add_argument('--image_dir', type=str, default='./data/images',
+    parser.add_argument('--image_dir', type=str, default='./data/new_data/images/train_img',
                         help='the path for images')
     parser.add_argument('--caption_json', type=str, default='./data/new_data/captions.json',
                         help='path for captions')
@@ -535,11 +523,11 @@ if __name__ == '__main__':
     parser.add_argument('--crop_size', type=int, default=224,
                         help='size for randomly cropping images')
     # Load/Save model argument
-    parser.add_argument('--model_path', type=str, default='./report_v4_models/',
+    parser.add_argument('--model_path', type=str, default='./modelsave',
                         help='path for saving trained models')
     parser.add_argument('--load_model_path', type=str, default='',
                         help='The path of loaded model')
-    parser.add_argument('--saved_model_name', type=str, default='v4',
+    parser.add_argument('--saved_model_name', type=str, default='/mod',
                         help='The name of saved model')
 
     """
@@ -547,7 +535,7 @@ if __name__ == '__main__':
     """
     parser.add_argument('--momentum', type=int, default=0.1)
     # VisualFeatureExtractor
-    parser.add_argument('--visual_model_name', type=str, default='resnet152',
+    parser.add_argument('--visual_model_name', type=str, default='densenet201',
                         help='CNN model name')
     parser.add_argument('--pretrained', action='store_true', default=True,
                         help='not using pretrained model when training')
@@ -570,7 +558,6 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_size', type=int, default=512)
     parser.add_argument('--load_co_model_path', type=str, default='.')
     parser.add_argument('--co_trained', action='store_true', default=True)
-
     # Sentence Model
     parser.add_argument('--sent_version', type=str, default='v1')
     parser.add_argument('--sentence_num_layers', type=int, default=2)
@@ -578,7 +565,6 @@ if __name__ == '__main__':
     parser.add_argument('--load_sentence_model_path', type=str,
                         default='.')
     parser.add_argument('--sentence_trained', action='store_true', default=True)
-
     # Word Model
     parser.add_argument('--word_num_layers', type=int, default=1)
     parser.add_argument('--load_word_model_path', type=str,
