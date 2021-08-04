@@ -375,7 +375,7 @@ class LSTMDebugger(DebuggerBase):
         return tag_loss, loss
 
     def _epoch_val(self):
-        tag_loss, loss = 0, 0, 0, 0
+        tag_loss, loss = 0, 0
         # self.extractor.eval()
         # self.mlc.eval()
         # self.co_attention.eval()
