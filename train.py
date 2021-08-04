@@ -20,13 +20,13 @@ class DebuggerBase:
         self.args = args
         self.min_val_loss = 10000000000
         self.min_val_tag_loss = 1000000
-        self.min_val_stop_loss = 1000000
-        self.min_val_word_loss = 10000000
+        #self.min_val_stop_loss = 1000000
+        #self.min_val_word_loss = 10000000
 
         self.min_train_loss = 10000000000
         self.min_train_tag_loss = 1000000
-        self.min_train_stop_loss = 1000000
-        self.min_train_word_loss = 10000000
+        #self.min_train_stop_loss = 1000000
+        #self.min_train_word_loss = 10000000
 
         self.params = None
 
@@ -248,23 +248,15 @@ class DebuggerBase:
 
     def _log(self,
              train_tags_loss,
-             train_stop_loss,
-             train_word_loss,
              train_loss,
              val_tags_loss,
-             val_stop_loss,
-             val_word_loss,
              val_loss,
              lr,
              epoch):
         info = {
             'train tags loss': train_tags_loss,
-            'train stop loss': train_stop_loss,
-            'train word loss': train_word_loss,
             'train loss': train_loss,
             'val tags loss': val_tags_loss,
-            'val stop loss': val_stop_loss,
-            'val word loss': val_word_loss,
             'val loss': val_loss,
             'learning rate': lr
         }
@@ -307,8 +299,6 @@ class DebuggerBase:
                     epoch_id,
                     val_loss,
                     val_tag_loss,
-                    val_stop_loss,
-                    val_word_loss,
                     train_loss):
         def save_whole_model(_filename):
             self.writer.write("Saved Model in {}\n".format(_filename))
