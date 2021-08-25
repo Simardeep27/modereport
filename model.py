@@ -24,7 +24,6 @@ class CustomVisual(nn.Module):
             densenet=models.densenet201(pretrained=self.pretrained)
             modules=list(densenet.features)
             model=nn.Sequential(*modules)
-            print(summary(model,(3,224.224)))
             func=nn.AvgPool2d(kernel_size=7,stride=1,padding=0)
             out_features=densenet.classifier.in_features
 
@@ -66,13 +65,14 @@ class CustomMLC(nn.Module):
         super(CustomMLC, self).__init__()
         self.net=nn.Sequential(
             nn.Conv2d(fc_in_features,classes,kernel_size=1,bias=False),
-            nn.BatchNorm2d(),
+            nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
 
             nn.Conv2d(classes,classes,kernel_size=3,bias=False),
-            nn.BatchNorm2d(),
+            nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
         )
+        print(self.net)
         self.classifier=nn.Linear(fc_in_features,classes)
         self.embed=nn.Embedding(classes,semantic_features_dim)
         self.k=k
@@ -108,6 +108,6 @@ if __name__ == '__main__':
 #
     extractor = CustomVisual(model_name='densenet201',pretrained=False)
     tags=MLC(fc_in_features=extractor.out_features)
-
+    tags=CustomMLC(fc_in_features=extractor.out_features)
 
 
