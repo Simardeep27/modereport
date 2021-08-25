@@ -4,6 +4,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torchvision.models as models
 import torchvision.transforms as transforms
+from torchsummary import summary
 
 
 class CustomVisual(nn.Module):
@@ -23,6 +24,7 @@ class CustomVisual(nn.Module):
             densenet=models.densenet201(pretrained=self.pretrained)
             modules=list(densenet.features)
             model=nn.Sequential(*modules)
+            print(summary(model,(3,224.224)))
             func=nn.AvgPool2d(kernel_size=7,stride=1,padding=0)
             out_features=densenet.classifier.in_features
 
@@ -43,7 +45,6 @@ class MLC(nn.Module):
         super(MLC, self).__init__()
         self.classifier=nn.Linear(in_features=fc_in_features,out_features=classes)
         self.embed=nn.Embedding(classes,sementic_features_dim)
-        print(self.embed)
         self.k=k
         self.softmax=nn.Softmax()
         self.__init_weight()
@@ -53,8 +54,38 @@ class MLC(nn.Module):
         self.classifier.bias.data.fill_(0)
 
     def forward(self,avg_features):
-
+        print('avg',avg_features)
         tags=self.softmax(self.classifier(avg_features))
+        semantic_features=self.embed(torch.topk(tags,self.k)[1])
+        return tags,semantic_features
+
+class CustomMLC(nn.Module):
+    def __init__(self,
+                 classes=156, semantic_features_dim=512,
+                 fc_in_features=2048,k=10):
+        super(CustomMLC, self).__init__()
+        self.net=nn.Sequential(
+            nn.Conv2d(fc_in_features,classes,kernel_size=1,bias=False),
+            nn.BatchNorm2d(),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(classes,classes,kernel_size=3,bias=False),
+            nn.BatchNorm2d(),
+            nn.ReLU(inplace=True),
+        )
+        self.classifier=nn.Linear(fc_in_features,classes)
+        self.embed=nn.Embedding(classes,semantic_features_dim)
+        self.k=k
+        self.softmax=nn.Softmax()
+        self.__init_weight()
+
+    def __init_weight(self):
+        self.classifier.weight.data.uniform_(-0.1, 0.1)
+        self.classifier.bias.data.fill_(0)
+
+    def forward(self,avg_features):
+        print('avg',avg_features)
+        tags=self.softmax(self.classifier(self.net(avg_features)))
         semantic_features=self.embed(torch.topk(tags,self.k)[1])
         return tags,semantic_features
 
@@ -75,8 +106,8 @@ if __name__ == '__main__':
     import warnings
     warnings.filterwarnings("ignore")
 #
-    extractor = CustomVisual(model_name='densenet201',pretrained=True)
+    extractor = CustomVisual(model_name='densenet201',pretrained=False)
     tags=MLC(fc_in_features=extractor.out_features)
-    print(tags)
+
 
 
