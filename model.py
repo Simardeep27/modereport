@@ -60,7 +60,7 @@ class CustomVisual(nn.Module):
 
 class MLC(nn.Module):
     def __init__(self,
-                 classes=156, semantic_features_dim=512,
+                 classes=156, sementic_features_dim=512,
                  fc_in_features=2048,k=10):
         super(MLC, self).__init__()
         self.net=nn.Sequential(
@@ -74,7 +74,7 @@ class MLC(nn.Module):
         )
         print(self.net)
         self.classifier=nn.Linear(fc_in_features,classes)
-        self.embed=nn.Embedding(classes,semantic_features_dim)
+        self.embed=nn.Embedding(classes,sementic_features_dim)
         self.k=k
         self.softmax=nn.Softmax()
         self.__init_weight()
