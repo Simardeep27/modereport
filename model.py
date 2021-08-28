@@ -71,9 +71,10 @@ class MLC(nn.Module):
             nn.Conv2d(classes,classes,kernel_size=3,bias=False),
             nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
+            
+            nn.Linear(fc_in_features,classes)
         )
         print(self.net)
-        self.classifier=nn.Linear(fc_in_features,classes)
         self.embed=nn.Embedding(classes,sementic_features_dim)
         self.k=k
         self.softmax=nn.Softmax()
@@ -85,7 +86,7 @@ class MLC(nn.Module):
 
     def forward(self,avg_features):
         print('avg',avg_features)
-        tags=self.softmax(self.classifier(self.net(avg_features)))
+        tags=self.softmax(self.net(avg_features))
         semantic_features=self.embed(torch.topk(tags,self.k)[1])
         return tags,semantic_features
 
