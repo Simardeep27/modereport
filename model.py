@@ -78,11 +78,11 @@ class MLC(nn.Module):
         self.embed=nn.Embedding(classes,sementic_features_dim)
         self.k=k
         self.softmax=nn.Softmax()
-        self.__init_weight()
+#         self.__init_weight()
 
-    def __init_weight(self):
-        self.classifier.weight.data.uniform_(-0.1, 0.1)
-        self.classifier.bias.data.fill_(0)
+#     def __init_weight(self):
+#         self.classifier.weight.data.uniform_(-0.1, 0.1)
+#         self.classifier.bias.data.fill_(0)
 
     def forward(self,avg_features):
         print('avg',avg_features)
