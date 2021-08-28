@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torchvision.models as models
 import torchvision.transforms as transforms
-from torchsummary import summary
+
 
 
 class CustomVisual(nn.Module):
@@ -36,7 +36,7 @@ class CustomVisual(nn.Module):
         avg_features=self.avg_func(visual_features).squeeze()
         return visual_features,avg_features
 
-class MLC(nn.Module):
+'''class MLC(nn.Module):
     def __init__(self,
                  classes=156,sementic_features_dim=512,
                  fc_in_features=2048,
@@ -56,13 +56,13 @@ class MLC(nn.Module):
         print('avg',avg_features)
         tags=self.softmax(self.classifier(avg_features))
         semantic_features=self.embed(torch.topk(tags,self.k)[1])
-        return tags,semantic_features
+        return tags,semantic_features'''
 
-class CustomMLC(nn.Module):
+class MLC(nn.Module):
     def __init__(self,
                  classes=156, semantic_features_dim=512,
                  fc_in_features=2048,k=10):
-        super(CustomMLC, self).__init__()
+        super(MLC, self).__init__()
         self.net=nn.Sequential(
             nn.Conv2d(fc_in_features,classes,kernel_size=1,bias=False),
             nn.BatchNorm2d(classes),
