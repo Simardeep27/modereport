@@ -86,7 +86,7 @@ class MLC(nn.Module):
 #         self.classifier.bias.data.fill_(0)
 
     def forward(self,avg_features):
-        avg_features=nn.View(avg_features.shape[0],avg_features.shape[1],1,1)
+        avg_features=torch.reshape(avg_features,(avg_features.shape[0],avg_features.shape[1],1,1))
         tags=self.softmax(self.net(avg_features))
         semantic_features=self.embed(torch.topk(tags,self.k)[1])
         return tags,semantic_features
