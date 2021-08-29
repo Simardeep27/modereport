@@ -34,6 +34,7 @@ class CustomVisual(nn.Module):
     def forward(self, images):
         visual_features=self.model(images)
         avg_features=self.avg_func(visual_features).squeeze()
+        print(avg_features.shape)
         return visual_features,avg_features
 
 '''class MLC(nn.Module):
