@@ -69,7 +69,7 @@ class MLC(nn.Module):
             nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
 
-            nn.Conv2d(fc_in_features/10,classes/10,kernel_size=1,bias=False),
+            nn.Conv2d(int(fc_in_features/10),int(classes/10),kernel_size=1,bias=False),
             nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
         )
