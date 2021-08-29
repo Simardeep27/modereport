@@ -34,7 +34,6 @@ class CustomVisual(nn.Module):
     def forward(self, images):
         visual_features=self.model(images)
         avg_features=self.avg_func(visual_features).squeeze()
-        print(avg_features.shape)
         return visual_features,avg_features
 
 '''class MLC(nn.Module):
@@ -65,6 +64,7 @@ class MLC(nn.Module):
                  fc_in_features=2048,k=10):
         super(MLC, self).__init__()
         self.net=nn.Sequential(
+            
             nn.Conv2d(fc_in_features,classes,kernel_size=1,bias=False),
             nn.BatchNorm2d(classes),
             nn.ReLU(inplace=True),
@@ -86,7 +86,7 @@ class MLC(nn.Module):
 #         self.classifier.bias.data.fill_(0)
 
     def forward(self,avg_features):
-        print('avg',avg_features)
+        avg_features=nn.View(avg_features.shape[0],avg_features.shape[1],1,1)
         tags=self.softmax(self.net(avg_features))
         semantic_features=self.embed(torch.topk(tags,self.k)[1])
         return tags,semantic_features
