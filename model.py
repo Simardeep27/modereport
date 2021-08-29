@@ -70,7 +70,7 @@ class MLC(nn.Module):
             nn.ReLU(inplace=True),
 
             nn.Conv2d(int(fc_in_features/10),int(classes/10),kernel_size=1,bias=False),
-            nn.BatchNorm2d(classes),
+            nn.BatchNorm2d(classes/10),
             nn.ReLU(inplace=True),
         )
         self.classifier=nn.Linear(fc_in_features,classes)
