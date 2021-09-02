@@ -65,12 +65,14 @@ class MLC(nn.Module):
         super(MLC, self).__init__()
         self.net=nn.Sequential(
             
-            nn.Conv2d(fc_in_features,classes,kernel_size=1,bias=False),
-            nn.BatchNorm2d(classes),
+            nn.Linear(fc_in_features,classes)
+            
+            nn.Conv2d(int(fc_in_features/2),int(classes/2),kernel_size=1,bias=False),
+            nn.BatchNorm2d(int(classes/2)),
             nn.ReLU(inplace=True),
 
-            nn.Conv2d(int(fc_in_features/10),int(classes/10),kernel_size=1,bias=False),
-            nn.BatchNorm2d(int(classes/10)),
+            nn.Conv2d(int(fc_in_features/4),int(classes/4),kernel_size=1,bias=False),
+            nn.BatchNorm2d(int(classes/4)),
             nn.ReLU(inplace=True),
         )
         self.classifier=nn.Linear(fc_in_features,classes)
