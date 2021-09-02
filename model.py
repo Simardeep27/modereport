@@ -65,7 +65,7 @@ class MLC(nn.Module):
         super(MLC, self).__init__()
         self.net=nn.Sequential(
             
-            nn.Linear(fc_in_features,classes)
+            nn.Linear(fc_in_features,classes),
             
             nn.Conv2d(int(fc_in_features/2),int(classes/2),kernel_size=1,bias=False),
             nn.BatchNorm2d(int(classes/2)),
