@@ -89,9 +89,8 @@ class MLC(nn.Module):
 
     def forward(self,avg_features):
         batch=avg_features.shape[0]
+        avg_features=torch.reshape(avg_features,(avg_features.shape[1],avg_features.shape[0],1,1))
         print(avg_features.shape)
-        print(batch)
-        avg_features=torch.reshape(avg_features,(avg_features.shape[0],avg_features.shape[1],1,1))
         avg_vals=self.net(avg_features)
         avg_vals = avg_vals.view(batch, -1)
         tags=self.softmax(self.classifier(avg_vals))
