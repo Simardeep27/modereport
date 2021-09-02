@@ -63,6 +63,7 @@ class MLC(nn.Module):
                  classes=156, sementic_features_dim=512,
                  fc_in_features=2048,k=10):
         super(MLC, self).__init__()
+        print(fc_in_features)
         self.net=nn.Sequential(
             
             nn.Linear(fc_in_features,classes),
